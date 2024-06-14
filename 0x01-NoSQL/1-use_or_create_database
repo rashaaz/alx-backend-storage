@@ -1,0 +1,2 @@
+// Selects database
+use my_db;
