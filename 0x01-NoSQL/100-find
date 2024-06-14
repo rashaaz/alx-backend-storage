@@ -1,0 +1,2 @@
+// Retrieves documents
+db.school.find({name: /^Holberton/ })
