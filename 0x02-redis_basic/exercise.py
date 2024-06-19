@@ -6,19 +6,19 @@ import redis
 from functools import wraps
 
 '''
-    This decorator counts the number
+    Writing strings to Redis.
 '''
 
 
 def count_calls(method: Callable) -> Callable:
     '''
-        Increment the call count
+        Counts the number of times a method is called.
     '''
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         '''
-            This decorator stores
+            Wrapper function.
         '''
         key = method.__qualname__
         self._redis.incr(key)
@@ -27,7 +27,8 @@ def count_calls(method: Callable) -> Callable:
 
 
 def call_history(method: Callable) -> Callable:
-    """ Append inputs and outputs
+    """ Decorator to store the history of inputs and
+    outputs for a particular function.
     """
     key = method.__qualname__
     inputs = key + ":inputs"
@@ -35,7 +36,7 @@ def call_history(method: Callable) -> Callable:
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):  # sourcery skip: avoid-builtin-shadow
-        """ Display the history """
+        """ Wrapper for decorator functionality """
         self._redis.rpush(inputs, str(args))
         data = method(self, *args, **kwargs)
         self._redis.rpush(outputs, str(data))
@@ -47,9 +48,9 @@ def call_history(method: Callable) -> Callable:
 def replay(method: Callable) -> None:
     # sourcery skip: use-fstring-for-concatenation, use-fstring-for-formatting
     """
-    Cache class to interact
+    Replays the history of a function
     Args:
-        method: client and flush database
+        method: The function to be decorated
     Returns:
         None
     """
@@ -66,11 +67,11 @@ def replay(method: Callable) -> None:
 
 class Cache:
     '''
-        Store data in Redis
+        Cache class.
     '''
     def __init__(self):
         '''
-            Retrieve data from Redis
+            Initialize the cache.
         '''
         self._redis = redis.Redis()
         self._redis.flushdb()
@@ -79,7 +80,7 @@ class Cache:
     @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         '''
-            Retrieve a string
+            Store data in the cache.
         '''
         randomKey = str(uuid4())
         self._redis.set(randomKey, data)
@@ -88,7 +89,7 @@ class Cache:
     def get(self, key: str,
             fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
         '''
-            Retrieve an integer
+            Get data from the cache.
         '''
         value = self._redis.get(key)
         if fn:
@@ -97,14 +98,14 @@ class Cache:
 
     def get_str(self, key: str) -> str:
         '''
-            Retrieve an integer
+            Get a string from the cache.
         '''
         value = self._redis.get(key)
         return value.decode('utf-8')
 
     def get_int(self, key: str) -> int:
         '''
-            Retrieve an integer
+            Get an int from the cache.
         '''
         value = self._redis.get(key)
         try:
