@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" This decorator counts """
+""" Redis Module """
 
 from functools import wraps
 import redis
@@ -10,10 +10,10 @@ redis_ = redis.Redis()
 
 
 def count_requests(method: Callable) -> Callable:
-    """ Increment the call """
+    """ Decortator for counting """
     @wraps(method)
     def wrapper(url):  # sourcery skip: use-named-expression
-        """ This decorator stores """
+        """ Wrapper for decorator """
         redis_.incr(f"count:{url}")
         cached_html = redis_.get(f"cached:{url}")
         if cached_html:
@@ -27,6 +27,6 @@ def count_requests(method: Callable) -> Callable:
 
 @count_requests
 def get_page(url: str) -> str:
-    """ Append inputs and outputs """
+    """ Obtain the HTML content of a  URL """
     req = requests.get(url)
     return req.text
